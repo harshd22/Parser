@@ -11,7 +11,6 @@ import javax.management.modelmbean.RequiredModelMBean;
 
 public class Parser {
 
-	private Controller controller;
 	Scanner scan;
 	String HTML;
 	BufferedReader reader;
@@ -29,28 +28,41 @@ public class Parser {
 
 	private void parseFile() {
 		String line;
-		sb.append("<html>" + "\n" + "<body>" + "\n" );
-		
+		sb.append("<html>" + "\n" + "<body>" + "\n");
+
 		try {
 			while ((line = reader.readLine()) != null) {
 
 				if (line.isEmpty()) {// New Paragraph
-					sb.append("</p>");
-					sb.append("\n");
-					sb.append("<p>");
+					parseNewParagraph();
+
 				} else if (line.startsWith("#")) {// New Heading
+					
 					parseHead(line);
 
-				} else {
-					if(!sb.toString().contains("<p>")) {
-						sb.append("<p>");
-					}
+				} 
+//				else if (line.startsWith("* ")) {
+//					parseUnorderedList(line);
+//
+//				} else if (line.startsWith(Character.DECIMAL_DIGIT_NUMBER + ". ")) {
+//					parseOrderedList(line);
+//
+//				} else if (line.startsWith("---") && !line.contains("A-z")) {
+//					sb.append("</p>" + "\n");
+//					sb.append("<hr/>" + "\n");
+//
+//				} else if (line.startsWith("> ")) {
+//
+//				} 
+				else {
+					checkPtag();
 					sb.append(line);
 
 				}
 
 			}
-			System.out.print(sb.toString());
+
+			parseSymbols ps = new parseSymbols(sb.toString());
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -58,47 +70,50 @@ public class Parser {
 
 	}
 
+	private void checkPtag() {
+		if (!sb.toString().contains("<p>")) {
+			sb.append("<p>");
+		}
+		
+	}
+
+	private void parseOrderedList(String line) {
+		// TODO Auto-generated method stub
+
+	}
+
+	private void parseUnorderedList(String line) {
+		if (!sb.toString().endsWith("</li>")) {
+			sb.append("<ul>");
+		}
+		sb.append("<li>");
+		sb.append(line.substring(2, line.length()));
+		sb.append("</li>");
+		// how to end the tag.
+
+	}
+
+	private void parseNewParagraph() {
+		sb.append("</p>" + "\n" + "<p>");
+
+	}
+
 	private void parseHead(String line) {
-		int i = 0;
-		char checkhead[] = line.toCharArray();
-		for (i = 0; i < checkhead.length; i++) {
-			if (checkhead[i] != '#') {
+		sb.append("</p>" + "\n");
+		int Level = checkHeadingLevel(line);
+		sb.append("<h" + Level + ">" + line.substring(Level, line.length()) + "</h" + Level + ">" + "\n");
+
+	}
+
+	private int checkHeadingLevel(String line) {
+		int index = 0;
+		char checkLevel[] = line.toCharArray();
+		for (index = 0; index < checkLevel.length; index++) {
+			if (checkLevel[index] != '#')
 				break;
-			}
+
 		}
-
-		sb.append("<h" + i + ">");
-		sb.append(line.substring(i + 1, line.length()));
-		sb.append("</h" + i + ">" + "\n");
-		
-	}
-
-	private void parseBold(String line, int index) {
-
-		for(int i = index ; i < chars.length; i++) {
-			if(chars[i] == '*' && chars[i+1] == '*') {
-				
-			}
-		}
-		
-		
-	}
-
-	private int parseItalics(String line, int index) {
-		for (int i = index; i < chars.length; i++) {
-			
-			if (chars[i] == '*' && chars[i + 1] != '*') { // if found another
-
-				
-				sb.append("<em>");
-				sb.append(line.substring(index,i));
-				sb.append("</em>");
-				return i;
-			}
-		}
-		sb.append(chars[index-1]);
 		return index;
-
 	}
 
 	private void readFile() {
