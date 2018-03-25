@@ -1,3 +1,4 @@
+package mainProgram;
 
 /**
  * This class Parses all the symbols in the text.
@@ -28,7 +29,7 @@ public class SymbolParser {
 		for (int index = 0; index < dataArray.length; index++) {
 
 			if (dataArray[index] == '*' && dataArray[index + 1] == '*' && dataArray[index + 2] != '\n') {
-				index = parseBold(this.data, index + 2);
+				index = parseBold(this.data, index);
 			} else
 				Html.append(dataArray[index]);
 		}
@@ -38,15 +39,13 @@ public class SymbolParser {
 		for (int index = 0; index < dataArray.length; index++) {
 
 			if (dataArray[index] == '*' && dataArray[index + 1] != '*' && dataArray[index + 1] != '\n') {
-				index = parseItalics(this.data, index + 1);
+				index = parseItalics(this.data, index);
 			} else
 				Html.append(dataArray[index]);
 		}
-
 		data = Html.toString();
-		//Html.append("</body> " + "\n" + "</html>");
-		System.out.println(Html.toString());
-
+		
+		
 	}
 
 	/**
@@ -55,6 +54,7 @@ public class SymbolParser {
 	 */
 	private void newInstance() {
 		data = Html.toString();
+		
 		dataArray = data.toCharArray();
 		Html = new StringBuilder();
 
@@ -68,35 +68,34 @@ public class SymbolParser {
 	 * @return
 	 */
 	private int parseItalics(String data, int index) {
-		for (int i = index; dataArray[i] != '\n'; i++) {
+		for (int i = index + 1; i < dataArray.length ; i++) {
 
-			if (dataArray[i] == '*' && dataArray[i + 1] != '*') { // if found another asterix
+			if (dataArray[i] == '*' && dataArray[i - 1] != '*') { // if found another asterix
 
-				Html.append("<em>" + data.substring(index, i) + "</em>");
+				Html.append("<em>" + data.substring(index + 1, i) + "</em>");
 				// Return the new index where it is found
 				return i;
 			}
 		}
 		// if not found then Return the old index to treat it as normal text.
-		Html.append(dataArray[index - 1]);
-		return index - 1;
+		Html.append(dataArray[index]);
+		return index;
 
 	}
 
-	private int parseBold(String data, int index) {
+	private int parseBold(String data, int index) throws ArrayIndexOutOfBoundsException{
 
-		for (int i = index; dataArray[i] != '\n'; i++) {
-
-			if (dataArray[i] == '*' && dataArray[i + 1] == '*') {// if found another pair of asterix
-
-				Html.append("<strong>" + data.substring(index, i) + "</strong>");
+		for (int i = index+2;  i < dataArray.length; i++) {
+			if (dataArray[i] == '*' && dataArray[i - 1] == '*') {// if found another pair of asterix
+				Html.append("<strong>" + data.substring(index + 2, i-1) + "</strong>");
 				// Return the new index where it is found
-				return i + 1;
+				return i  ;
 			}
 		}
 		// if not found then Return the old index to treat it as normal text.
-		Html.append(dataArray[index - 2]);
-		return index - 2;
+		Html.append(dataArray[index]);
+	
+		return index;
 
 	}
 

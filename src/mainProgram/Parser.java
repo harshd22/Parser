@@ -1,3 +1,4 @@
+package mainProgram;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,28 +12,28 @@ import javax.management.modelmbean.RequiredModelMBean;
 import javax.swing.text.html.HTMLEditorKit;
 
 /**
- * This is the main Parsing class in which file is parsed line by line and converted to html 
- * then passed to the other object for checking the symbols.
+ * This is the main Parsing class in which file is parsed line by line and
+ * converted to html then passed to the other object for checking the symbols.
  * 
  * @author Harsh
  *
  */
 public class Parser {
 
-	
 	private BufferedReader reader;
 	private File data;
 	private StringBuilder Html;
 	private SymbolParser symbolParser;
-	
-	
+
 	/**
 	 * 
-	 * Parser constructer takes the data file and calls the function to start parsing.
+	 * Parser constructer takes the data file and calls the function to start
+	 * parsing.
+	 * 
 	 * @param data
 	 * 
 	 */
-	Parser(File data) {
+	public Parser(File data) {
 		this.data = data;
 		Html = new StringBuilder();
 		readFile();
@@ -45,8 +46,7 @@ public class Parser {
 	 */
 	private void parseFile() {
 		String line;
-		Html.append("<html>" + "\n" + "<body>" + "\n");
-
+		
 		try {
 			while ((line = reader.readLine()) != null) {
 
@@ -63,7 +63,6 @@ public class Parser {
 
 				} else if (line.startsWith("---")) { // Horizontal rule
 					parseHorizintalRule(line);
-					
 
 				} else if (line.startsWith("> ")) { // BlockQuote
 					checkList();
@@ -75,10 +74,8 @@ public class Parser {
 				}
 
 			}
-			
-			parseSymbols();
-			
 
+			parseSymbols();
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -86,51 +83,55 @@ public class Parser {
 
 	}
 
-
 	/**
 	 * Parses the Horizontal rule
+	 * 
 	 * @param line
 	 */
 	private void parseHorizintalRule(String line) {
 		char chars[] = line.toCharArray();
-		for(int i = 0 ; i < chars.length ; i++) {//Checks if The line just only contains '-'.
-			
-			if(chars[i] != '-') {
-				Html.append("<p>" + line ); 
+		for (int i = 0; i < chars.length; i++) {// Checks if The line just only contains '-'.
+
+			if (chars[i] != '-') {
+				Html.append("<p>" + line);
 				return;
 			}
 		}
-		
-			Html.append("</p>" + "\n" + "<hr/>" + "\n" + "<p>");
-			
-		
-		
+
+		Html.append("</p>" + "\n" + "<hr/>" + "\n" + "<p>");
+
 	}
 
 	/**
-	 * Checks for the end tags and 
-	 * Creates a new symbol parser 
+	 * Checks for the end tags and Creates a new symbol parser
 	 */
 	private void parseSymbols() {
-		if (!Html.toString().endsWith("</h>") || !Html.toString().endsWith("</ul>") ||  Html.toString().endsWith("<p>")) {
+		if (!Html.toString().endsWith("</h>") || !Html.toString().endsWith("</ul>")
+				|| Html.toString().endsWith("<p>")) {
 			Html.append("</p>");
-			}
+		}
 		symbolParser = new SymbolParser(Html.toString().replaceAll("<p></p>", ""));
-		
+
 	}
 
 	/**
 	 * Parses the block Quotes
+	 * 
 	 * @param line
 	 * @throws IOException
 	 */
 	private void parseBlockQuote(String line) throws IOException {
-		//Html.append("<blockquote>" + "<p>"  + line.substring(2, line.length()));
-		//Read the file line by line.
-		while((line = reader.readLine()) != null ) { 
-			if (line.isEmpty() || line.startsWith("#") || line.startsWith("* ") || line.startsWith("> ")) { //Check if the paragraph in Blockquote ends
+		Html.append("<blockquote>" + "<p>" + line.substring(2, line.length()));
+		// Read the file line by line.
+		while ((line = reader.readLine()) != null) {
+			if (line.isEmpty() || line.startsWith("#") || line.startsWith("* ") || line.startsWith("> ")) { // Check if
+																											// the
+																											// paragraph
+																											// in
+																											// Blockquote
+																											// ends
 				break;
-			} else { //Else just add it into block quote
+			} else { // Else just add it into block quote
 				Html.append(line);
 			}
 		}
@@ -142,10 +143,10 @@ public class Parser {
 	 * Checks if list is ending or not.
 	 */
 	private void checkList() {
-		if(Html.toString().endsWith("</li>")) {
+		if (Html.toString().endsWith("</li>")) {
 			Html.append("</ul>" + "\n" + "<p>");
-				}
-		
+		}
+
 	}
 
 	/**
@@ -167,7 +168,7 @@ public class Parser {
 		if (!Html.toString().endsWith("</li>")) {
 			Html.append("<ul>");
 		}
-		Html.append("<li>" + (line.substring(2, line.length())) + "</li>" );
+		Html.append("<li>" + (line.substring(2, line.length())) + "</li>");
 
 	}
 
@@ -185,10 +186,10 @@ public class Parser {
 	 * @param line
 	 */
 	private void parseHeading(String line) {
-		if(Html.toString().contains("<p>"))
+		if (Html.toString().contains("<p>"))
 			Html.append("</p>" + "\n");
 		int Level = checkHeadingLevel(line);
-		Html.append("<h" + Level + ">" + line.substring(Level, line.length()) + "</h" + Level + ">" );
+		Html.append("<h" + Level + ">" + line.substring(Level, line.length()) + "</h" + Level + ">");
 		Html.append("<p>");
 	}
 
@@ -229,6 +230,5 @@ public class Parser {
 	public SymbolParser getSymbolParser() {
 		return symbolParser;
 	}
-
 
 }
