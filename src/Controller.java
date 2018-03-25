@@ -3,6 +3,11 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+/**
+ * Controller handles the file choosing.
+ * @author Harsh
+ *
+ */
 public class Controller {
 
 	private File file;
@@ -13,10 +18,13 @@ public class Controller {
 		this.model = model;
 	}
 
+	/**
+	 * Opens a Jfilechooser , choose the file and send it for parsing.
+	 */
 	public void chooseFile() {
 
 		JFileChooser chooser = new JFileChooser();
-		
+		//Sets the file filter.
 		chooser.setFileFilter(new FileNameExtensionFilter("Text Files", "txt"));
 		chooser.setCurrentDirectory(new File("."));
 		chooser.setDialogTitle("Select File");
@@ -26,6 +34,7 @@ public class Controller {
 			file = chooser.getSelectedFile();
 		}
 		
+		//If file is not null then send it for parsing.
 		if(file != null) {
 			model.startParsing(file);
 		}

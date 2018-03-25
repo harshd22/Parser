@@ -10,6 +10,13 @@ import java.util.regex.Pattern;
 import javax.management.modelmbean.RequiredModelMBean;
 import javax.swing.text.html.HTMLEditorKit;
 
+/**
+ * This is the main Parsing class in which file is parsed line by line and converted to html 
+ * then passed to the other object for checking the symbols.
+ * 
+ * @author Harsh
+ *
+ */
 public class Parser {
 
 	
@@ -19,6 +26,12 @@ public class Parser {
 	private SymbolParser symbolParser;
 	
 	
+	/**
+	 * 
+	 * Parser constructer takes the data file and calls the function to start parsing.
+	 * @param data
+	 * 
+	 */
 	Parser(File data) {
 		this.data = data;
 		Html = new StringBuilder();
@@ -27,8 +40,12 @@ public class Parser {
 
 	}
 
+	/**
+	 * Reads file line by line and parse it to html.
+	 */
 	private void parseFile() {
 		String line;
+		reader.
 		Html.append("<html>" + "\n" + "<body>" + "\n");
 
 		try {
@@ -46,8 +63,8 @@ public class Parser {
 					parseUnorderedList(line);
 
 				} else if (line.startsWith("---")) { // Horizontal rule
-					Html.append("</p>" + "\n");
-					Html.append("<hr/>" + "\n" + "<p>");
+					parseHorizintalRule(line);
+					
 
 				} else if (line.startsWith("> ")) { // BlockQuote
 					checkList();
@@ -72,6 +89,27 @@ public class Parser {
 	}
 
 
+	/**
+	 * Parses the Horizontal rule
+	 * @param line
+	 */
+	private void parseHorizintalRule(String line) {
+		char chars[] = line.toCharArray();
+		for(int i = 0 ; i < chars.length ; i++) {
+			if(chars[i] != '-') {
+				return;
+			}
+		}
+		
+			Html.append("</p>" + "\n");
+			Html.append("<hr/>" + "\n" + "<p>");
+		
+		
+	}
+
+	/**
+	 * Parses the Symbols
+	 */
 	private void parseSymbols() {
 		if (!Html.toString().endsWith("</h>") || !Html.toString().endsWith("</ul>") ||  Html.toString().endsWith("<p>")) {
 			Html.append("</p>");
@@ -80,6 +118,11 @@ public class Parser {
 		
 	}
 
+	/**
+	 * Parses the block Quotes
+	 * @param line
+	 * @throws IOException
+	 */
 	private void parseBlockQuote(String line) throws IOException {
 		Html.append("<blockquote>" + "<p>"  + line.substring(2, line.length()));
 		while((line = reader.readLine()) != null ) {
@@ -93,6 +136,9 @@ public class Parser {
 
 	}
 
+	/**
+	 * Checks if list is ending or not.
+	 */
 	private void checkList() {
 		if(Html.toString().endsWith("</li>")) {
 			Html.append("</ul>" + "\n" + "<p>");
@@ -100,6 +146,9 @@ public class Parser {
 		
 	}
 
+	/**
+	 * checks if the html contains the p tag or not.
+	 */
 	private void checkPtag() {
 		if (!Html.toString().contains("<p>") ) {
 			Html.append("<p>");
@@ -109,6 +158,11 @@ public class Parser {
 	}
 
 
+	/**
+	 * Parses the unordered list.
+	 * 
+	 * @param line
+	 */
 	private void parseUnorderedList(String line) {
 		if (!Html.toString().endsWith("</li>")) {
 			Html.append("<ul>");
@@ -120,11 +174,19 @@ public class Parser {
 
 	}
 
+	/**
+	 * Adds the tag If new paragraph has to start
+	 */
 	private void parseNewParagraph() {
 		Html.append("</p>" + "\n" + "<p>");
 
 	}
 
+	/**
+	 * Parse the headings.
+	 * 
+	 * @param line
+	 */
 	private void parseHeading(String line) {
 		if(Html.toString().contains("<p>"))
 			Html.append("</p>" + "\n");
@@ -133,6 +195,13 @@ public class Parser {
 		Html.append("<p>");
 	}
 
+	/**
+	 * 
+	 * Check the level of heading .
+	 * 
+	 * @param line
+	 * @return
+	 */
 	private int checkHeadingLevel(String line) {
 		int index = 0;
 		char checkLevel[] = line.toCharArray();
@@ -144,6 +213,9 @@ public class Parser {
 		return index;
 	}
 
+	/**
+	 * Reads the file with buffered reader
+	 */
 	private void readFile() {
 
 		try {

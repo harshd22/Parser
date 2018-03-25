@@ -24,9 +24,7 @@ public class SymbolParser {
 				Html.append(dataArray[index]);
 		}
 
-		data = Html.toString();
-		dataArray = data.toCharArray();
-		Html = new StringBuilder();
+		newInstance();
 
 		for (int index = 0; index < dataArray.length; index++) {
 
@@ -39,6 +37,13 @@ public class SymbolParser {
 		data = Html.toString();
 		Html.append("</body> " + "</html>");
 
+	}
+
+	private void newInstance() {
+		data = Html.toString();
+		dataArray = data.toCharArray();
+		Html = new StringBuilder();
+		
 	}
 
 	private int parseItalics(String data, int index) {

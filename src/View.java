@@ -9,6 +9,11 @@ import javax.swing.JToolBar;
 import javax.swing.text.EditorKit;
 import javax.swing.text.html.HTMLEditorKit;
 
+/**
+ * View class shows the Jframe in which the Html text is shown.
+ * @author Harsh
+ * 
+ */
 public class View extends JFrame {
 
 	private JButton loadFile;
