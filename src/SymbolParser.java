@@ -1,11 +1,11 @@
 
-public class parseSymbols {
+public class SymbolParser {
 
 	private StringBuilder Html;
 	private char dataArray[];
 	private String data;
 
-	public parseSymbols(String data) {
+	public SymbolParser(String data) {
 		this.data = data;
 		Html = new StringBuilder();
 		parseAsterix();
@@ -14,7 +14,6 @@ public class parseSymbols {
 
 	private void parseAsterix() {
 
-		
 		dataArray = data.toCharArray();
 
 		for (int index = 0; index < dataArray.length; index++) {
@@ -36,10 +35,10 @@ public class parseSymbols {
 			} else
 				Html.append(dataArray[index]);
 		}
-		
+
 		data = Html.toString();
-		 Html.append("</body> " + "</html>");
-		//System.out.println(Html.toString());
+		Html.append("</body> " + "</html>");
+
 	}
 
 	private int parseItalics(String data, int index) {
@@ -53,7 +52,7 @@ public class parseSymbols {
 			}
 		}
 		Html.append(dataArray[index - 1]);
-		return index-1;
+		return index - 1;
 
 	}
 
@@ -67,16 +66,14 @@ public class parseSymbols {
 				return i + 1;
 			}
 		}
-		
-		Html.append(dataArray[index-2]);
-		
-		
+
+		Html.append(dataArray[index - 2]);
+
 		return index - 2;
 	}
 
 	public StringBuilder getHtml() {
 		return Html;
 	}
-
 
 }

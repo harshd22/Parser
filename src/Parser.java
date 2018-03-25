@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.management.modelmbean.RequiredModelMBean;
+import javax.swing.text.html.HTMLEditorKit;
 
 public class Parser {
 
@@ -15,7 +16,7 @@ public class Parser {
 	private BufferedReader reader;
 	private File data;
 	private StringBuilder Html;
-	private parseSymbols symbolParser;
+	private SymbolParser symbolParser;
 	
 	
 	Parser(File data) {
@@ -34,37 +35,35 @@ public class Parser {
 			while ((line = reader.readLine()) != null) {
 
 				if (line.isEmpty()) {// New Paragraph
+					checkList();
 					parseNewParagraph();
 
 				} else if (line.startsWith("#")) {// New Heading
-					
+					checkList();
 					parseHeading(line);
 
-				} 
-//				else if (line.startsWith("* ")) {
-//					parseUnorderedList(line);
-//
-//				} else if (line.startsWith(Character.DECIMAL_DIGIT_NUMBER + ". ")) {
-//					parseOrderedList(line);
-//
-//				} else if (line.startsWith("---") && !line.contains("A-z")) {
-//					Html.append("</p>" + "\n");
-//					Html.append("<hr/>" + "\n");
-//
-//				} else if (line.startsWith("> ")) {
-//
-//				} 
-				else {
+				} else if (line.startsWith("* ")) {// Un- ordered list (doesn't check for the nested list)
+					parseUnorderedList(line);
+
+				} else if (line.startsWith("---")) { // Horizontal rule
+					Html.append("</p>" + "\n");
+					Html.append("<hr/>" + "\n" + "<p>");
+
+				} else if (line.startsWith("> ")) { // BlockQuote
+					checkList();
+					parseBlockQuote(line);
+				} else { // Simple Text
 					checkPtag();
-					Html.append(line);
+					Html.append(line + " ");
 
 				}
 
 			}
+			
+			parseSymbols();
+			
 
-			symbolParser = new parseSymbols(Html.toString());
-			
-			
+			System.out.println(Html.toString());
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -72,17 +71,43 @@ public class Parser {
 
 	}
 
-	private void checkPtag() {
-		if (!Html.toString().contains("<p>")) {
-			Html.append("<p>");
-		}
+
+	private void parseSymbols() {
+		if (!Html.toString().endsWith("</h>") || !Html.toString().endsWith("</ul>") ||  Html.toString().endsWith("<p>")) {
+			Html.append("</p>");
+			}
+		symbolParser = new SymbolParser(Html.toString().replaceAll("<p></p>", ""));
 		
 	}
 
-	private void parseOrderedList(String line) {
-		// TODO Auto-generated method stub
+	private void parseBlockQuote(String line) throws IOException {
+		Html.append("<blockquote>" + "<p>"  + line.substring(2, line.length()));
+		while((line = reader.readLine()) != null ) {
+			if (line.isEmpty() || line.startsWith("#") || line.startsWith("* ") || line.startsWith("> ")) {
+				break;
+			} else {
+				Html.append(line);
+			}
+		}
+		Html.append("</p>" + "</blockquote>" + "\n" + "<p>");
 
 	}
+
+	private void checkList() {
+		if(Html.toString().endsWith("</li>")) {
+			Html.append("</ul>" + "\n" + "<p>");
+				}
+		
+	}
+
+	private void checkPtag() {
+		if (!Html.toString().contains("<p>") ) {
+			Html.append("<p>");
+		}
+		
+		
+	}
+
 
 	private void parseUnorderedList(String line) {
 		if (!Html.toString().endsWith("</li>")) {
@@ -101,10 +126,11 @@ public class Parser {
 	}
 
 	private void parseHeading(String line) {
-		Html.append("</p>" + "\n");
+		if(Html.toString().contains("<p>"))
+			Html.append("</p>" + "\n");
 		int Level = checkHeadingLevel(line);
 		Html.append("<h" + Level + ">" + line.substring(Level, line.length()) + "</h" + Level + ">" + "\n");
-
+		Html.append("<p>");
 	}
 
 	private int checkHeadingLevel(String line) {
@@ -131,7 +157,7 @@ public class Parser {
 		return Html;
 	}
 
-	public parseSymbols getSymbolParser() {
+	public SymbolParser getSymbolParser() {
 		return symbolParser;
 	}
 
