@@ -28,8 +28,9 @@ public class SymbolParser {
 		// Search for the single Asterix for Italics
 		for (int index = 0; index < dataArray.length; index++) {
 
-			if (dataArray[index] == '*' && dataArray[index + 1] == '*' && dataArray[index + 2] != '\n') {
-				index = parseBold(this.data, index);
+			if (dataArray[index] == '*' && dataArray[index + 2] != '\n') {
+				if(dataArray[index - 1] == '*' )
+					{index = parseBold(this.data, index );}
 			} else
 				Html.append(dataArray[index]);
 		}
@@ -39,7 +40,7 @@ public class SymbolParser {
 		for (int index = 0; index < dataArray.length; index++) {
 
 			if (dataArray[index] == '*' && dataArray[index + 1] != '*' && dataArray[index + 1] != '\n') {
-				index = parseItalics(this.data, index);
+				index = parseItalics(this.data, index + 1);
 			} else
 				Html.append(dataArray[index]);
 		}
@@ -68,33 +69,35 @@ public class SymbolParser {
 	 * @return
 	 */
 	private int parseItalics(String data, int index) {
-		for (int i = index + 1; i < dataArray.length ; i++) {
+		for (int i = index; dataArray[i] != '\n'; i++) {
 
-			if (dataArray[i] == '*' && dataArray[i - 1] != '*') { // if found another asterix
+			if (dataArray[i] == '*' && dataArray[i + 1] != '*') { // if found another asterix
 
-				Html.append("<em>" + data.substring(index + 1, i) + "</em>");
+				Html.append("<em>" + data.substring(index, i) + "</em>");
 				// Return the new index where it is found
 				return i;
 			}
 		}
 		// if not found then Return the old index to treat it as normal text.
-		Html.append(dataArray[index]);
-		return index;
+		Html.append(dataArray[index - 1]);
+		return index - 1;
 
 	}
 
-	private int parseBold(String data, int index) throws ArrayIndexOutOfBoundsException{
+	private int parseBold(String data, int index) {
 
-		for (int i = index+2;  i < dataArray.length; i++) {
+		for (int i = index+1; dataArray[i] != '\n'; i++) {
+
 			if (dataArray[i] == '*' && dataArray[i - 1] == '*') {// if found another pair of asterix
-				Html.append("<strong>" + data.substring(index + 2, i-1) + "</strong>");
+
+				Html.append("<strong>" + data.substring(index+1, i-1) + "</strong>");
 				// Return the new index where it is found
-				return i  ;
+				return i ;
 			}
 		}
 		// if not found then Return the old index to treat it as normal text.
+		Html.append(dataArray[index-1]);
 		Html.append(dataArray[index]);
-	
 		return index;
 
 	}

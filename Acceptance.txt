@@ -1,9 +1,9 @@
 #This is h1 heading
 ##h2 heading
 ----
-**bold**bold
+**bold**bold**
 ---
-Ita*li**cs
+Ita*lics*
 
 * this is
 * unordered
